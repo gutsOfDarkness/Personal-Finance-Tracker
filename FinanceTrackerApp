@@ -1,0 +1,124 @@
+package com.example.finance;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class FinanceTrackerApp {
+    private enum EntryType {
+        INCOME, EXPENSE
+    }
+
+    private static class Entry {
+        private EntryType type;
+        private String description;
+        private double amount;
+        private LocalDate date;
+
+        public Entry(EntryType type, String description, double amount, LocalDate date) {
+            this.type = type;
+            this.description = description;
+            this.amount = amount;
+            this.date = date;
+        }
+
+        public EntryType getType() {
+            return type;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public double getAmount() {
+            return amount;
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        @Override
+        public String toString() {
+            return type + ": " + description + " - " + amount + " on " + date;
+        }
+    }
+
+    private static List<Entry> entries = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("1. Add Income");
+            System.out.println("2. Add Expense");
+            System.out.println("3. View Summary");
+            System.out.println("4. Remove Entry");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    addEntry(scanner, EntryType.INCOME);
+                    break;
+                case 2:
+                    addEntry(scanner, EntryType.EXPENSE);
+                    break;
+                case 3:
+                    viewSummary();
+                    break;
+                case 4:
+                    removeEntry(scanner);
+                    break;
+                case 5:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void addEntry(Scanner scanner, EntryType type) {
+        System.out.print("Enter description: ");
+        String description = scanner.nextLine();
+        System.out.print("Enter amount: ");
+        double amount = scanner.nextDouble();
+        scanner.nextLine(); // Consume newline
+        LocalDate date = LocalDate.now();
+        entries.add(new Entry(type, description, amount, date));
+    }
+
+    private static void viewSummary() {
+        double totalIncome = 0;
+        double totalExpense = 0;
+        for (Entry entry : entries) {
+            if (entry.getType() == EntryType.INCOME) {
+                totalIncome += entry.getAmount();
+            } else {
+                totalExpense += entry.getAmount();
+            }
+        }
+        double savings = totalIncome - totalExpense;
+        System.out.println("Total Income: " + totalIncome);
+        System.out.println("Total Expense: " + totalExpense);
+        System.out.println("Savings: " + savings);
+    }
+
+    private static void removeEntry(Scanner scanner) {
+        System.out.println("Entries:");
+        for (int i = 0; i < entries.size(); i++) {
+            System.out.println((i + 1) + ". " + entries.get(i));
+        }
+        System.out.print("Enter entry number to remove: ");
+        int entryNumber = scanner.nextInt();
+        if (entryNumber > 0 && entryNumber <= entries.size()) {
+            entries.remove(entryNumber - 1);
+        } else {
+            System.out.println("Invalid entry number.");
+        }
+    }
+}
